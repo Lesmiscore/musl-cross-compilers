@@ -15,8 +15,9 @@ const data = {
   on: {
     push: {
       branches: ["master"],
-      workflow_dispatch: { inputs: {} },
     },
+    workflow_dispatch: { inputs: {} },
+    schedule: [{ cron: "0 */12 * * *" }],
   },
   jobs: {
     prepare: {
@@ -27,7 +28,12 @@ const data = {
       needs: "prepare",
       "runs-on": "ubuntu-latest",
       "continue-on-error": true,
-      strategy: { matrix: { target: targets, repo: repositories } },
+      strategy: {
+        matrix: {
+          target: targets,
+          repo: repositories,
+        },
+      },
       env: {
         TARGET: "${{ matrix.target }}",
       },
@@ -39,7 +45,13 @@ const data = {
         },
         {
           name: "Build it",
-          run: "cd mcm\nmake -j4\nls",
+          run: [
+            'export OUTPUT="$PWD/output"',
+            "cd mcm",
+            "make -j4",
+            "make install",
+            "ls $OUTPUT",
+          ].join("\n"),
         },
       ],
     },
