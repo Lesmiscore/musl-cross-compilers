@@ -26,6 +26,7 @@ const data = {
     compile: {
       needs: "prepare",
       "runs-on": "ubuntu-latest",
+      "continue-on-error": true,
       strategy: { matrix: { target: targets, repo: repositories } },
       env: {
         TARGET: "${{ matrix.target }}",
