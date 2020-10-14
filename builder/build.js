@@ -44,9 +44,10 @@ const data = {
           run: "git clone https://github.com/${{ matrix.repo }} mcm",
         },
         {
-          name: "Build it",
+          name: "Build ${{ matrix.target }}",
           run: [
-            'export OUTPUT="$PWD/output"',
+            'export OUTPUT="${{ github.workspace }}/output"',
+            "mkdir -p $OUTPUT",
             "cd mcm",
             "make -j4",
             "make install",

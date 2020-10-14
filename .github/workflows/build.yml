@@ -75,9 +75,10 @@ jobs:
       - uses: actions/checkout@v2
       - name: 'Clone ${{ matrix.repo }}'
         run: 'git clone https://github.com/${{ matrix.repo }} mcm'
-      - name: Build it
+      - name: 'Build ${{ matrix.target }}'
         run: |-
-          export OUTPUT="$PWD/output"
+          export OUTPUT="${{ github.workspace }}/output"
+          mkdir -p $OUTPUT
           cd mcm
           make -j4
           make install
