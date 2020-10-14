@@ -21,7 +21,7 @@ const variant = core.getInput("variant", { required: true });
       cachedPath = await tc.cacheDir(toolchainExtractedFolder, "mcm", `${target}-${variant}.tar.gz`);
       console.log(`Installed at ${cachedPath}`);
     }
-    cachedPath = path.join(cachedPath, "outputs", "bin");
+    cachedPath = path.join(cachedPath, "output", "bin");
     console.log(`Binaries are at ${cachedPath}`);
     core.addPath(cachedPath);
     core.setOutput("path", cachedPath);
