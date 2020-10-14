@@ -85,7 +85,7 @@ const data = {
           name: "Package ${{ matrix.target }}",
           id: "package",
           run: [
-            "tar -cvf ../output-${{ matrix.target }}.tar.gz output/",
+            "tar -czvf ../output-${{ matrix.target }}.tar.gz output/",
             "echo ::set-output name=source_escaped::${REPO%%/*}_${REPO##*/}",
           ].join("\n"),
           "working-directory": "mcm",
