@@ -12,20 +12,13 @@ const variant = core.getInput("variant", { required: true });
       "_"
     )}.tar.gz`;
 
-    let cachedPath = tc.find(
-      "mcm",
-      `${target}-${variant}.tar.gz`
-    );
+    let cachedPath = tc.find("mcm", `${target}-${variant}.tar.gz`);
     if (cachedPath) {
       console.log(`Found cache at ${cachedPath}`);
     } else {
       const toolchainPath = await tc.downloadTool(url);
       const toolchainExtractedFolder = await tc.extractTar(toolchainPath);
-      cachedPath = await tc.cacheDir(
-        toolchainExtractedFolder,
-        "mcm",
-        `${target}-${variant}.tar.gz`
-      );
+      cachedPath = await tc.cacheDir(toolchainExtractedFolder, "mcm", `${target}-${variant}.tar.gz`);
       console.log(`Installed at ${cachedPath}`);
     }
     cachedPath = path.join(cachedPath, "outputs", "bin");

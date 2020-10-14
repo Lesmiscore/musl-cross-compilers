@@ -19,8 +19,7 @@ const data = {
     workflow_dispatch: {
       inputs: {
         do_release: {
-          description:
-            'Create a release and upload files? (type "yes" to create)',
+          description: 'Create a release and upload files? (type "yes" to create)',
           required: true,
           default: "no",
         },
@@ -43,7 +42,7 @@ const data = {
           name: "Create release",
           uses: "actions/create-release@v1",
           id: "create_release",
-          if: '${{ github.event.inputs.do_release == \'yes\' }}',
+          if: "${{ github.event.inputs.do_release == 'yes' }}",
           with: {
             tag_name: "${{ github.event.inputs.release }}",
             release_name: "${{ github.event.inputs.release }}",
@@ -84,13 +83,12 @@ const data = {
         {
           name: "Package ${{ matrix.target }}",
           id: "package",
-          run: [
-            "tar -czvf ../output-${{ matrix.target }}.tar.gz output/",
-            "echo ::set-output name=source_escaped::${REPO%%/*}_${REPO##*/}",
-          ].join("\n"),
+          run: ["tar -czvf ../output-${{ matrix.target }}.tar.gz output/", "echo ::set-output name=source_escaped::${REPO%%/*}_${REPO##*/}"].join(
+            "\n"
+          ),
           "working-directory": "mcm",
         },
-        {
+        /*{
           name: "Upload artifacts",
           uses: "actions/upload-artifact@v2",
           with: {
@@ -103,7 +101,7 @@ const data = {
           id: "upload",
           name: "Upload to releases",
           uses: "actions/upload-release-asset@v1",
-          if: '${{ github.event.inputs.do_release == \'yes\' }}',
+          if: "${{ github.event.inputs.do_release == 'yes' }}",
           with: {
             asset_path: "output-${{ matrix.target }}.tar.gz",
             asset_name:
@@ -114,10 +112,54 @@ const data = {
           env: {
             GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
           },
-        },
+        },*/
       ],
     },
   },
 };
+
+const retries = 5;
+for (let i = 0; i < retries; i++) {
+  let artifactsIf, releasesIf, continueOnError;
+  if (i == 0) {
+    artifactsIf = `\${{ success() }}`;
+    releasesIf = `\${{ github.event.inputs.do_release == 'yes' }}`;
+  } else {
+    artifactsIf = `\${{ steps.upload-artifacts-${i - 1}.outcome == 'failure' }}`;
+    releasesIf = `\${{ github.event.inputs.do_release == 'yes' && steps.upload-releases-${i - 1}.outcome == 'failure' }}`;
+  }
+  continueOnError = i == retries - 1;
+  const uploadSteps = [
+    {
+      id: `upload-artifacts-${i}`,
+      name: "Upload artifacts",
+      if: artifactsIf,
+      "continue-on-error": continueOnError,
+      uses: "actions/upload-artifact@v2",
+      with: {
+        path: "output-${{ matrix.target }}.tar.gz",
+        name: "${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}",
+      },
+    },
+    {
+      id: `upload-releases-${i}`,
+      name: "Upload to releases",
+      uses: "actions/upload-release-asset@v1",
+      if: releasesIf,
+      "continue-on-error": continueOnError,
+      with: {
+        asset_path: "output-${{ matrix.target }}.tar.gz",
+        asset_name: "output-${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}.tar.gz",
+        upload_url: "${{ needs.prepare.outputs.upload_url }}",
+        asset_content_type: "application/gzip",
+      },
+      env: {
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+      },
+    },
+  ];
+
+  data.jobs.compile.steps.push(...uploadSteps);
+}
 
 console.log(yaml.dump(data));
