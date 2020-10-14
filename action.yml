@@ -1,0 +1,16 @@
+name: 'musl cross-compiler'
+description: 'Installs musl cross-compiler into PATH'
+inputs:
+  target:
+    description: 'Target triple'
+    required: true
+  variant:
+    description: 'The variant (source repository) you wish to download'
+    required: true
+    default: 'richfelker/musl-cross-make'
+outputs:
+  directory:
+    description: 'The directory where the binaries are'
+runs:
+  using: 'node12'
+  main: 'index.js'
