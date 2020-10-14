@@ -1,0 +1,29 @@
+on:
+  push:
+    branches: [master]
+
+name: Test this action
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Download aarch64 cross compiler
+        uses: ./
+        id: compiler
+        with:
+          target: aarch64-linux-musl
+          variant: pmmp/musl-cross-make
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make autoconf automake libtool-bin m4 wget gzip bzip2 bison g++ re2c
+      - name: Build project
+        run: |
+          echo ${{ steps.compiler.outputs.path }}
+          ls   ${{ steps.compiler.outputs.path }}
+          wget https://github.com/pmmp/php-build-scripts/raw/master/compile.sh
+          chmod a+x compile.sh
+          ./compile.sh -t android-aarch64 -x -j4 -f -s
