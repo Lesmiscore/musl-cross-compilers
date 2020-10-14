@@ -7,7 +7,7 @@ const variant = core.getInput("variant", { required: true });
 
 (async () => {
   try {
-    const url = `https://github.com/nao20010128nao/musl-cross-compilers/releases/download/hello/output-${target}-${variant.replace(
+    const url = `https://github.com/nao20010128nao/musl-cross-compilers/releases/download/morning/output-${target}-${variant.replace(
       "/",
       "_"
     )}.tar.gz`;
