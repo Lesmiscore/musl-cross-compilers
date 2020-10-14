@@ -17,7 +17,7 @@ const data = {
       branches: ["master"],
     },
     workflow_dispatch: { inputs: {} },
-    schedule: [{ cron: "0 */12 * * *" }],
+    schedule: [{ cron: "0 6,18 * * *" }],
   },
   jobs: {
     prepare: {
@@ -45,14 +45,23 @@ const data = {
         },
         {
           name: "Build ${{ matrix.target }}",
-          run: [
-            'export OUTPUT="${{ github.workspace }}/output"',
-            "mkdir -p $OUTPUT",
-            "cd mcm",
-            "make -j4",
-            "make install",
-            "ls $OUTPUT",
-          ].join("\n"),
+          run: ["make -j4", "make install", "ls output"].join("\n"),
+          "working-directory": "mcm",
+        },
+        {
+          name: "Package ${{ matrix.target }}",
+          run: ["tar -cvf ../output-${{ matrix.target }}.tar.gz output/"].join(
+            "\n"
+          ),
+          "working-directory": "mcm",
+        },
+        {
+          name: "Upload artifacts",
+          uses: "actions/upload-artifact@v2",
+          with: {
+            path: "output-${{ matrix.target }}.tar.gz",
+            name: "${{ matrix.target }}-${{ matrix.repo }}",
+          },
         },
       ],
     },

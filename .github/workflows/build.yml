@@ -6,7 +6,7 @@ name: Build cross compilers
   workflow_dispatch:
     inputs: {}
   schedule:
-    - cron: 0 */12 * * *
+    - cron: '0 6,18 * * *'
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -77,10 +77,16 @@ jobs:
         run: 'git clone https://github.com/${{ matrix.repo }} mcm'
       - name: 'Build ${{ matrix.target }}'
         run: |-
-          export OUTPUT="${{ github.workspace }}/output"
-          mkdir -p $OUTPUT
-          cd mcm
           make -j4
           make install
-          ls $OUTPUT
+          ls output
+        working-directory: mcm
+      - name: 'Package ${{ matrix.target }}'
+        run: 'tar -cvf ../output-${{ matrix.target }}.tar.gz output/'
+        working-directory: mcm
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: 'output-${{ matrix.target }}.tar.gz'
+          name: '${{ matrix.target }}-${{ matrix.repo }}'
 
