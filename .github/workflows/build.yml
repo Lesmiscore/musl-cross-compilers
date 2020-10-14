@@ -4,14 +4,33 @@ name: Build cross compilers
     branches:
       - master
   workflow_dispatch:
-    inputs: {}
+    inputs:
+      do_release:
+        description: Create a release and upload files? (type "yes" to create)
+        required: true
+        default: 'no'
+      release:
+        description: Release tag and name
+        required: true
   schedule:
     - cron: '0 6,18 * * *'
 jobs:
   prepare:
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: '${{ steps.create_release.outputs.upload_url }}'
     steps:
-      - uses: actions/checkout@v2
+      - name: Create release
+        uses: actions/create-release@v1
+        id: create_release
+        if: '${{ github.event.inputs.do_release == "yes" }}'
+        with:
+          tag_name: '${{ github.event.inputs.release }}'
+          release_name: '${{ github.event.inputs.release }}'
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
   compile:
     needs: prepare
     runs-on: ubuntu-latest
@@ -93,4 +112,17 @@ jobs:
         with:
           path: 'output-${{ matrix.target }}.tar.gz'
           name: '${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}'
+      - id: upload
+        name: Upload to releases
+        uses: actions/upload-release-asset@v1
+        if: '${{ github.event.inputs.do_release == "yes" }}'
+        with:
+          asset_path: 'output-${{ matrix.target }}.tar.gz'
+          asset_name: >-
+            output-${{ matrix.target }}-${{ steps.package.outputs.source_escaped
+            }}.tar.gz
+          upload_url: '${{ needs.prepare.outputs.upload_url }}'
+          asset_content_type: application/gzip
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
 
