@@ -43,7 +43,7 @@ const data = {
           name: "Create release",
           uses: "actions/create-release@v1",
           id: "create_release",
-          if: '${{ github.event.inputs.do_release == "yes" }}',
+          if: '${{ github.event.inputs.do_release == \'yes\' }}',
           with: {
             tag_name: "${{ github.event.inputs.release }}",
             release_name: "${{ github.event.inputs.release }}",
@@ -103,7 +103,7 @@ const data = {
           id: "upload",
           name: "Upload to releases",
           uses: "actions/upload-release-asset@v1",
-          if: '${{ github.event.inputs.do_release == "yes" }}',
+          if: '${{ github.event.inputs.do_release == \'yes\' }}',
           with: {
             asset_path: "output-${{ matrix.target }}.tar.gz",
             asset_name:
