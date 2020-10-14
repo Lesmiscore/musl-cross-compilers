@@ -36,6 +36,7 @@ const data = {
       },
       env: {
         TARGET: "${{ matrix.target }}",
+        REPO: "${{ matrix.repo }}",
       },
       steps: [
         { uses: "actions/checkout@v2" },
@@ -50,7 +51,11 @@ const data = {
         },
         {
           name: "Package ${{ matrix.target }}",
-          run: ["tar -cvf ../output-${{ matrix.target }}.tar.gz output/"].join(
+          id: "package",
+          run: [
+            "tar -cvf ../output-${{ matrix.target }}.tar.gz output/",
+            "echo ::set-output name=source_escaped::${REPO%%/*}_${REPO##*/}"
+          ].join(
             "\n"
           ),
           "working-directory": "mcm",
@@ -60,7 +65,7 @@ const data = {
           uses: "actions/upload-artifact@v2",
           with: {
             path: "output-${{ matrix.target }}.tar.gz",
-            name: "${{ matrix.target }}-${{ matrix.repo }}",
+            name: "${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}",
           },
         },
       ],

@@ -71,6 +71,7 @@ jobs:
           - pmmp/musl-cross-make
     env:
       TARGET: '${{ matrix.target }}'
+      REPO: '${{ matrix.repo }}'
     steps:
       - uses: actions/checkout@v2
       - name: 'Clone ${{ matrix.repo }}'
@@ -82,11 +83,14 @@ jobs:
           ls output
         working-directory: mcm
       - name: 'Package ${{ matrix.target }}'
-        run: 'tar -cvf ../output-${{ matrix.target }}.tar.gz output/'
+        id: package
+        run: |-
+          tar -cvf ../output-${{ matrix.target }}.tar.gz output/
+          echo ::set-output name=source_escaped::${REPO%%/*}_${REPO##*/}
         working-directory: mcm
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           path: 'output-${{ matrix.target }}.tar.gz'
-          name: '${{ matrix.target }}-${{ matrix.repo }}'
+          name: '${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}'
 
