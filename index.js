@@ -7,9 +7,15 @@ const variant = core.getInput("variant", { required: true });
 
 (async () => {
   try {
-    const url = `${target}-${variant}.tar.gz`;
+    const url = `https://github.com/nao20010128nao/musl-cross-compilers/releases/download/hello/output-${target}-${variant.replace(
+      "/",
+      "_"
+    )}.tar.gz`;
 
-    let cachedPath = tc.find("mcm", `https://github.com/nao20010128nao/musl-cross-compilers/releases/download/hello/output-${target}-${variant.replace("/","_")}.tar.gz`);
+    let cachedPath = tc.find(
+      "mcm",
+      `${target}-${variant}.tar.gz`
+    );
     if (cachedPath) {
       console.log(`Found cache at ${cachedPath}`);
     } else {

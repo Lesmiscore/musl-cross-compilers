@@ -1,8 +1,5 @@
 name: Build cross compilers
 'on':
-  push:
-    branches:
-      - master
   workflow_dispatch:
     inputs:
       do_release:
@@ -12,8 +9,6 @@ name: Build cross compilers
       release:
         description: Release tag and name
         required: true
-  schedule:
-    - cron: '0 6,18 * * *'
 jobs:
   prepare:
     runs-on: ubuntu-latest

@@ -13,9 +13,9 @@ const repositories = ["richfelker/musl-cross-make", "pmmp/musl-cross-make"];
 const data = {
   name: "Build cross compilers",
   on: {
-    push: {
+    /*push: {
       branches: ["master"],
-    },
+    },*/
     workflow_dispatch: {
       inputs: {
         do_release: {
@@ -30,7 +30,7 @@ const data = {
         },
       },
     },
-    schedule: [{ cron: "0 6,18 * * *" }],
+    //schedule: [{ cron: "0 6,18 * * *" }],
   },
   jobs: {
     prepare: {
