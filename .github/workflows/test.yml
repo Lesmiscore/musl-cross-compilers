@@ -7,6 +7,7 @@ name: Test this action
 jobs:
   test:
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
       matrix:
         build: [false, true]
