@@ -24,7 +24,21 @@ const tags = {
     if (build) {
       const destDir = path.join("/opt/", target, variant);
       await io.mkdirP(destDir);
-      let ret = await exec.exec("git", ["clone", `https://github.com/${variant}.git`, destDir], {
+      let ret = await exec.exec("sudo", ["apt", "update"], {
+        ignoreReturnCode: true,
+      });
+      if (ret != 0) {
+        throw new Error(`apt update failed with code ${ret}`);
+      }
+
+      ret = await exec.exec("sudo", ["apt", "install", "build-essential"], {
+        ignoreReturnCode: true,
+      });
+      if (ret != 0) {
+        throw new Error(`apt install failed with code ${ret}`);
+      }
+
+      ret = await exec.exec("git", ["clone", `https://github.com/${variant}.git`, destDir], {
         ignoreReturnCode: true,
       });
       if (ret != 0) {
