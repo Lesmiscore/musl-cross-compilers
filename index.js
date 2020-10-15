@@ -72,7 +72,7 @@ const tags = {
   } catch (e) {
     if (build) {
       console.log("Build error occured and showing last config.log");
-      await exec.exec("bash", ["-e", `LC_ALL=en_US.UTF-8 find . -name config.log -printf "%T@ %p\n" | sort -n | awk '{print $NF}' | xargs cat`], {
+      await exec.exec("bash", ["-c", `LC_ALL=en_US.UTF-8 find . -name config.log -printf "%T@ %p\n" | sort -n | awk '{print $NF}' | xargs cat`], {
         ignoreReturnCode: true,
       });
     }
