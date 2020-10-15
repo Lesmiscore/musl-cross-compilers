@@ -25,7 +25,22 @@ const tags = {
     if (build) {
       const destDir = buildDir;
       await io.mkdirP(destDir);
-      let ret = await exec.exec("git", ["clone", `https://github.com/${variant}.git`, destDir], {
+      // https://stackoverflow.com/questions/11912878/gcc-error-gcc-error-trying-to-exec-cc1-execvp-no-such-file-or-directory
+      let ret = await exec.exec("sudo", ["apt", "update"], {
+        ignoreReturnCode: true,
+      });
+      if (ret != 0) {
+        console.error(`apt update failed with code ${ret}`);
+      }
+
+      ret = await exec.exec("sudo", ["apt", "install", "--reinstall", "build-essential"], {
+        ignoreReturnCode: true,
+      });
+      if (ret != 0) {
+        console.error(`apt install failed with code ${ret}`);
+      }
+
+      ret = await exec.exec("git", ["clone", `https://github.com/${variant}.git`, destDir], {
         ignoreReturnCode: true,
       });
       if (ret != 0) {
@@ -78,9 +93,7 @@ const tags = {
       const artifactName = `musl-cross-compiler-error-${target}-${variant.replace("/", "_")}`;
       const files = ["/opt/mcm.tar.gz"];
       const rootDirectory = "/opt/";
-      const options = {
-        continueOnError: true,
-      };
+      const options = {};
       await artifactClient.uploadArtifact(artifactName, files, rootDirectory, options);
     }
     core.setFailed(e);
