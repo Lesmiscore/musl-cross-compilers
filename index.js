@@ -7,7 +7,7 @@ const path = require("path");
 const target = core.getInput("target", { required: true });
 const variant = core.getInput("variant", { required: true });
 const build = core.getInput("build").toUpperCase() === "TRUE";
-const buildDest = path.join("/opt/", target, variant);
+const buildDir = path.join("/opt/", target, variant);
 
 const tags = {
   "pmmp/musl-cross-make": "eraser",
@@ -23,7 +23,7 @@ const tags = {
 
     let cachedPath;
     if (build) {
-      const destDir = buildDest;
+      const destDir = buildDir;
       await io.mkdirP(destDir);
       let ret = await exec.exec("git", ["clone", `https://github.com/${variant}.git`, destDir], {
         ignoreReturnCode: true,
@@ -71,10 +71,17 @@ const tags = {
     core.setOutput("path", cachedPath);
   } catch (e) {
     if (build) {
-      console.log("Build error occured and showing last config.log");
-      await exec.exec("bash", ["-c", `LC_ALL=en_US.UTF-8 find . -name config.log -printf "%T@ %p\n" | sort -n | awk '{print $NF}' | xargs cat`], {
-        ignoreReturnCode: true,
-      });
+      console.log("Build error occured and uploading build directory as artifacts");
+      await exec.exec("tar", ["-czf", "/opt/mcm.tar.gz", buildDir]);
+      const artifact = require("@actions/artifact");
+      const artifactClient = artifact.create();
+      const artifactName = `musl-cross-compiler-error-${target}-${variant.replace("/", "_")}`;
+      const files = ["/opt/mcm.tar.gz"];
+      const rootDirectory = "/opt/";
+      const options = {
+        continueOnError: true,
+      };
+      await artifactClient.uploadArtifact(artifactName, files, rootDirectory, options);
     }
     core.setFailed(e);
   }
