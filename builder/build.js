@@ -13,9 +13,8 @@ const repositories = ["richfelker/musl-cross-make", "pmmp/musl-cross-make"];
 const data = {
   name: "Build cross compilers",
   on: {
-    /*push: {
-      branches: ["master"],
-    },*/
+    // builds must be invoked by hand as number of jobs reaches 95,
+    // causing Actions queue being filled for an hour
     workflow_dispatch: {
       inputs: {
         do_release: {
@@ -29,7 +28,6 @@ const data = {
         },
       },
     },
-    //schedule: [{ cron: "0 6,18 * * *" }],
   },
   jobs: {
     prepare: {
@@ -88,31 +86,6 @@ const data = {
           ),
           "working-directory": "mcm",
         },
-        /*{
-          name: "Upload artifacts",
-          uses: "actions/upload-artifact@v2",
-          with: {
-            path: "output-${{ matrix.target }}.tar.gz",
-            name:
-              "${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}",
-          },
-        },
-        {
-          id: "upload",
-          name: "Upload to releases",
-          uses: "actions/upload-release-asset@v1",
-          if: "${{ github.event.inputs.do_release == 'yes' }}",
-          with: {
-            asset_path: "output-${{ matrix.target }}.tar.gz",
-            asset_name:
-              "output-${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}.tar.gz",
-            upload_url: "${{ needs.prepare.outputs.upload_url }}",
-            asset_content_type: "application/gzip",
-          },
-          env: {
-            GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
-          },
-        },*/
       ],
     },
   },
@@ -132,7 +105,7 @@ for (let i = 0; i < retries; i++) {
   const uploadSteps = [
     {
       id: `upload-artifacts-${i}`,
-      name: "Upload artifacts",
+      name: `Upload artifacts ${i}`,
       if: artifactsIf,
       "continue-on-error": continueOnError,
       uses: "actions/upload-artifact@v2",
@@ -143,7 +116,7 @@ for (let i = 0; i < retries; i++) {
     },
     {
       id: `upload-releases-${i}`,
-      name: "Upload to releases",
+      name: `Upload to releases ${i}`,
       uses: "actions/upload-release-asset@v1",
       if: releasesIf,
       "continue-on-error": continueOnError,

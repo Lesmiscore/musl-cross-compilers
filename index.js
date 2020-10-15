@@ -8,9 +8,14 @@ const target = core.getInput("target", { required: true });
 const variant = core.getInput("variant", { required: true });
 const build = core.getInput("build").toUpperCase() === "TRUE";
 
+const tags = {
+  "pmmp/musl-cross-make": "eraser",
+  "richfelker/musl-cross-make": "eraser",
+};
+
 (async () => {
   try {
-    const url = `https://github.com/nao20010128nao/musl-cross-compilers/releases/download/eraser/output-${target}-${variant.replace(
+    const url = `https://github.com/nao20010128nao/musl-cross-compilers/releases/download/${tags[variant]}/output-${target}-${variant.replace(
       "/",
       "_"
     )}.tar.gz`;
@@ -19,13 +24,16 @@ const build = core.getInput("build").toUpperCase() === "TRUE";
     if (build) {
       const destDir = path.join("/opt/", target, variant);
       await io.mkdirP(destDir);
-      let ret = await exec.exec("git", ["clone", `https://github.com/${variant}.git`, destDir]);
+      let ret = await exec.exec("git", ["clone", `https://github.com/${variant}.git`, destDir], {
+        ignoreReturnCode: true,
+      });
       if (ret != 0) {
         throw new Error(`git clone failed with code ${ret}`);
       }
 
       ret = await exec.exec("make", ["-j4"], {
         cwd: destDir,
+        ignoreReturnCode: true,
         env: {
           TARGET: target,
         },
@@ -36,6 +44,7 @@ const build = core.getInput("build").toUpperCase() === "TRUE";
 
       ret = await exec.exec("make", ["install"], {
         cwd: destDir,
+        ignoreReturnCode: true,
         env: {
           TARGET: target,
         },
