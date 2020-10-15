@@ -7,6 +7,10 @@ name: Test this action
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build: [false, true]
+        variant: [pmmp/musl-cross-make, richfelker/musl-cross-make]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -15,7 +19,8 @@ jobs:
         id: compiler
         with:
           target: aarch64-linux-musl
-          variant: pmmp/musl-cross-make
+          variant: ${{ matrix.variant }}
+          build: ${{ matrix.build }}
       - name: Install deps
         run: |
           sudo apt-get update

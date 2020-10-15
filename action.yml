@@ -8,6 +8,10 @@ inputs:
     description: 'The variant (source repository) you wish to download'
     required: true
     default: 'richfelker/musl-cross-make'
+  build:
+    description: 'Build instead of download?'
+    required: false
+    default: false
 outputs:
   directory:
     description: 'The directory where the binaries are'
