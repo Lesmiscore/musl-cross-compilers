@@ -33,7 +33,7 @@ const tags = {
         console.error(`apt update failed with code ${ret}`);
       }
 
-      ret = await exec.exec("sudo", ["apt", "install", "--reinstall", "build-essential"], {
+      ret = await exec.exec("sudo", ["apt", "install", "--reinstall", "gcc", "g++"], {
         ignoreReturnCode: true,
       });
       if (ret != 0) {
