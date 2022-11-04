@@ -16,12 +16,12 @@ jobs:
       upload_url: '${{ steps.create_release.outputs.upload_url }}'
     steps:
       - name: Create release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         id: create_release
         if: '${{ github.event.inputs.do_release == ''yes'' }}'
         with:
-          tag_name: '${{ github.event.inputs.release }}'
-          release_name: '${{ github.event.inputs.release }}'
+          tag: '${{ github.event.inputs.release }}'
+          name: '${{ github.event.inputs.release }}'
           draft: false
           prerelease: false
         env:
