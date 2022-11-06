@@ -10,8 +10,8 @@ const build = core.getInput("build").toUpperCase() === "TRUE";
 const buildDir = path.join("/opt/", target, variant);
 
 const tags = {
-  "pmmp/musl-cross-make": "internet",
-  "richfelker/musl-cross-make": "internet",
+  "pmmp/musl-cross-make": "heracles",
+  "richfelker/musl-cross-make": "heracles",
 };
 
 (async () => {
