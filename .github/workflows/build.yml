@@ -87,7 +87,7 @@ jobs:
       TARGET: '${{ matrix.target }}'
       REPO: '${{ matrix.repo }}'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Clone ${{ matrix.repo }}'
         run: 'git clone https://github.com/${{ matrix.repo }} mcm'
       - name: 'Build ${{ matrix.target }}'
