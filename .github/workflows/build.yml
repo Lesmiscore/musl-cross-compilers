@@ -106,7 +106,7 @@ jobs:
         name: Upload artifacts 0
         if: '${{ success() }}'
         continue-on-error: false
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: 'output-${{ matrix.target }}.tar.gz'
           name: '${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}'
@@ -128,7 +128,7 @@ jobs:
         name: Upload artifacts 1
         if: '${{ steps.upload-artifacts-0.outcome == ''failure'' }}'
         continue-on-error: false
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: 'output-${{ matrix.target }}.tar.gz'
           name: '${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}'
@@ -152,7 +152,7 @@ jobs:
         name: Upload artifacts 2
         if: '${{ steps.upload-artifacts-1.outcome == ''failure'' }}'
         continue-on-error: false
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: 'output-${{ matrix.target }}.tar.gz'
           name: '${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}'
@@ -176,7 +176,7 @@ jobs:
         name: Upload artifacts 3
         if: '${{ steps.upload-artifacts-2.outcome == ''failure'' }}'
         continue-on-error: false
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: 'output-${{ matrix.target }}.tar.gz'
           name: '${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}'
@@ -200,7 +200,7 @@ jobs:
         name: Upload artifacts 4
         if: '${{ steps.upload-artifacts-3.outcome == ''failure'' }}'
         continue-on-error: true
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: 'output-${{ matrix.target }}.tar.gz'
           name: '${{ matrix.target }}-${{ steps.package.outputs.source_escaped }}'
